@@ -1,18 +1,13 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.akefirad.groom</id>
-    <name>groom</name>
-    <vendor>akefirad</vendor>
+    <id>com.akefirad.groom</id>
+    <name>Groom</name>
+    <vendor email="akefirad@gmail.com" url="https://akefirad.com">Rad Akefirad</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.akefirad.groom.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.akefirad.groom.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 </idea-plugin>

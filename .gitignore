@@ -1,5 +1,9 @@
+### Intellij ###
 .gradle
 .idea
 .intellijPlatform
-.qodana
 build
+.qodana
+
+### MacOS ###
+.DS_Store

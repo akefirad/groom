@@ -1,6 +1,4 @@
-<!-- Keep a Changelog guide -> https://keepachangelog.com -->
-
-# groom Changelog
+# Groom Changelog
 
 ## [Unreleased]
 ### Added
