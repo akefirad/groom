@@ -4,8 +4,10 @@
     <vendor email="akefirad@gmail.com" url="https://akefirad.com">Rad Akefirad</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.intellij.groovy</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <lang.foldingBuilder language="Groovy" implementationClass="com.akefirad.groom.spock.SpockFoldingBuilder"/>
     </extensions>
 
     <applicationListeners>
