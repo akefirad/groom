@@ -8,6 +8,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import org.jetbrains.plugins.groovy.lang.parser.GroovyElementTypes
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrLabeledStatement
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
@@ -28,10 +29,14 @@ class SpockFoldingBuilder : CustomFoldingBuilder(), DumbAware {
     private fun addSpockLabelFoldRegions(c: Context, d: MutableList<FoldingDescriptor>, e: PsiElement) {
         var ctx = c
         for (child in e.children) {
-            if (child is GrMethod)
+            if (child is GrMethod) {
                 ctx = ctx.copy(method = child)
-            else if (child.isSpockLabel())
-                addSpockLabelFoldRegion(ctx, d, child)
+            } else if (child.isSpockLabel()) {
+                val children = child.children
+                val hasNothing = children.isEmpty() || children.first().isSpockLabel()
+                if (hasNothing == false)
+                    addSpockLabelFoldRegion(ctx, d, child)
+            }
 
             addSpockLabelFoldRegions(ctx, d, child)
         }
@@ -62,7 +67,10 @@ class SpockFoldingBuilder : CustomFoldingBuilder(), DumbAware {
     private fun PsiElement.isSpockLabel() =
         this is GrLabeledStatement && labels.contains(name)
 
-    override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange) = node.text
+    override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String {
+        val hasTitle = node.lastChildNode.elementType == GroovyElementTypes.LITERAL
+        return if (hasTitle) node.text else (node.firstChildNode.text + ": ...")
+    }
 
     override fun isRegionCollapsedByDefault(node: ASTNode) = false
 
