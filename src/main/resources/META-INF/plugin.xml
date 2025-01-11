@@ -4,6 +4,7 @@
     <vendor email="akefirad@gmail.com" url="https://akefirad.com">Rad Akefirad</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
     <depends>org.intellij.groovy</depends>
 
     <extensions defaultExtensionNs="com.intellij">

@@ -1,8 +1,9 @@
-package foo.bar
+// TODO: move the test to foo.bar package and remove the Specification class definition
+package spock.lang
 
-import spock.lang.Specification
+class Specification {}
 
-class SampleClass {
+class SampleClass extends Specification <fold text='{...}'>{
     def 'empty list/map should fold'() <fold text='{...}'>{
             def lst1 = []
             def lst2 = [ ]
@@ -51,4 +52,4 @@ class SampleClass {
     }</fold>
 
     // TODO: add more cases!
-}
+}</fold>
