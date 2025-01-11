@@ -13,7 +13,7 @@ on:
 
 jobs:
 
-  testUI:
+  test-ui:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -31,33 +31,27 @@ jobs:
 
     steps:
 
-      # Check out the current repository
-      - name: Fetch Sources
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up Java environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: zulu
           java-version: 17
 
-      # Setup Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Run IDEA prepared for UI testing
       - name: Run IDE
         run: ${{ matrix.runIde }}
 
-      # Wait for IDEA to be started
-      - name: Health Check
+      - name: Health check
         uses: jtalk/url-health-check-action@v4
         with:
           url: http://127.0.0.1:8082
           max-attempts: 15
           retry-delay: 30s
 
-      # Run tests
-      - name: Tests
+      - name: Run tests
         run: ./gradlew test
