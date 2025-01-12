@@ -70,6 +70,8 @@ class SpockFoldingBuilder : CustomFoldingBuilder() {
 
     override fun isRegionCollapsedByDefault(node: ASTNode) = false
 
+    override fun isDumbAware() = false
+
     private data class Context(val method: PsiElement? = null) {
         fun methodEndOffset() = method?.textRange?.endOffset ?: throw IllegalStateException()
     }
