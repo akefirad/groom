@@ -11,6 +11,7 @@ import com.intellij.codeInsight.hints.declarative.InlineInlayPosition
 import com.intellij.codeInsight.hints.declarative.PresentationTreeBuilder
 import com.intellij.codeInsight.hints.declarative.SharedBypassCollector
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.PossiblyDumbAware
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock
@@ -20,13 +21,14 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpres
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
 
-class AssertInlayHintsProvider : InlayHintsProvider {
+class AssertInlayHintsProvider : InlayHintsProvider, PossiblyDumbAware {
 
     override fun createCollector(file: PsiFile, editor: Editor): InlayHintsCollector? {
         if (file.hasAnySpecification() == false) return null
         return AssertInlayHintsCollector()
     }
 
+    override fun isDumbAware() = false
 }
 
 class AssertInlayHintsCollector : SharedBypassCollector {
