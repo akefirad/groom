@@ -4,9 +4,9 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
 class GroovyFoldingBuilderTest : BasePlatformTestCase() {
 
-    override fun getTestDataPath() = "src/test/resources/test-data"
+    override fun getTestDataPath() = "src/test/resources/test-data/${javaClass.simpleName}"
 
-    fun testFolding() {
-        myFixture.testFolding("$testDataPath/${javaClass.simpleName}Data.groovy")
+    fun `test folding builder`() {
+        myFixture.testFolding("$testDataPath/ExpectedTestData.groovy")
     }
 }
