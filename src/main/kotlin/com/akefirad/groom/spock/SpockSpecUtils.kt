@@ -2,7 +2,6 @@ package com.akefirad.groom.spock
 
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrLabeledStatement
 
@@ -26,8 +25,14 @@ object SpockSpecUtils {
         generateSequence(clazz) { it.superClass }
             .any { it.qualifiedName == SPOCK_SPEC_CLASS }
 
-
     fun PsiElement.isSpockLabel() =
         this is GrLabeledStatement && SpockSpecLabel.entries.any { it.label == name }
+
+    fun PsiElement.isContinuationLabel() = isAnyOf(SpockSpecLabel.AND)
+
+    fun PsiElement.isExpectationLabel() = isAnyOf(SpockSpecLabel.THEN, SpockSpecLabel.EXPECT)
+
+    private fun PsiElement.isAnyOf(label: SpockSpecLabel, vararg others: SpockSpecLabel) =
+        this is GrLabeledStatement && setOf(label, *others).any { it.label == name }
 
 }
