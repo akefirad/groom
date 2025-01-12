@@ -4,31 +4,53 @@ package spock.lang
 class Specification {}
 
 class SampleClass extends Specification <fold text='{...}'>{
-    def 'empty list/map should fold'() <fold text='{...}'>{
+    def 'empty list should fold'() <fold text='{...}'>{
             def lst1 = []
             def lst2 = [ ]
             def lst3 = [
             ]
 
+            println([])
+            println([ ])
+    }</fold>
+
+    def 'empty map should fold'() <fold text='{...}'>{
             def map1 = [:]
             def map2 = [ : ]
             def map3 = [
                 :
             ]
+
+            println([:])
+            println([ : ])
     }</fold>
 
-    def 'non-empty list/map should fold'() <fold text='{...}'>{
+    def 'non-empty list should fold'() <fold text='{...}'>{
              def lst1 = [1, 2]
              def lst2 = <fold text='[...]'>[
                  1,
                  2,
              ]</fold>
 
+            println([1, 2])
+            println(<fold text='[...]'>[
+                1,
+                2,
+            ]</fold>)
+     }</fold>
+
+    def 'non-empty map should fold'() <fold text='{...}'>{
              def map1 = [foo: 1, bar: 2]
-             def map2 = <fold text='[...]'>[
+             def map2 = <fold text='[...:...]'>[
                  foo: 1,
                  bar: 2,
              ]</fold>
+
+            println([foo: 1, bar: 2])
+            println(<fold text='[...:...]'>[
+                foo: 1,
+                bar: 2,
+            ]</fold>)
      }</fold>
 
    def 'nexted list/map should not fold'() <fold text='{...}'>{
@@ -37,7 +59,7 @@ class SampleClass extends Specification <fold text='{...}'>{
                 [2, 3],
             ]</fold>
 
-            def map = <fold text='[...]'>[
+            def map = <fold text='[...:...]'>[
                 foo: 1,
                 bar: [baz: 2],
             ]</fold>
