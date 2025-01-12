@@ -3,11 +3,11 @@ package com.akefirad.groom.groovy
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.elementType
 import org.jetbrains.plugins.groovy.lang.parser.GroovyElementTypes
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.auxiliary.GrListOrMap
@@ -48,16 +48,10 @@ class GroovyFoldingBuilder : CustomFoldingBuilder() {
 
     override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String {
         val selected = node.getChildren(TokenSet.create(GroovyElementTypes.LIST_OR_MAP))
-        return if (selected.isEmpty() || selected.size > 1) {
-            thisLogger().warn("Unexpected number of children: ${selected.size}")
-            "..."
-        } else when (val psi = selected.single().psi) {
-            is GrListOrMap -> if (psi.isMap) "[...:...]" else "[...]"
-            else -> {
-                thisLogger().warn("Unexpected type: ${psi}")
-                "..."
-            }
-        }
+        assert(selected.size == 1) { "Unexpected number of children: ${selected.size}" }
+        val psi = selected.single().psi
+        check(psi is GrListOrMap) { "Unexpected type: ${psi.elementType}" }
+        return if (psi.isMap) "[...:...]" else "[...]"
     }
 
     override fun isRegionCollapsedByDefault(node: ASTNode) = false

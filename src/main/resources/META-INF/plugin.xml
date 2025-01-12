@@ -9,6 +9,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <lang.foldingBuilder language="Groovy" implementationClass="com.akefirad.groom.groovy.GroovyFoldingBuilder"/>
+
+        <annotator language="Groovy" implementationClass="com.akefirad.groom.spock.SpockLabelAnnotator"/>
         <lang.foldingBuilder language="Groovy" implementationClass="com.akefirad.groom.spock.SpockFoldingBuilder"/>
     </extensions>
 
