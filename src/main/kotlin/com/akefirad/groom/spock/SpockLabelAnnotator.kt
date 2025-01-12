@@ -28,9 +28,9 @@ class SpockLabelAnnotator : Annotator {
         val title = e.children.first() as? GrLiteral
 
         if (title == null)
-            h.newAnnotation(HighlightSeverity.ERROR, "Spock labels should have a title!")
+            h.newAnnotation(HighlightSeverity.WARNING, "Spock labels should have a title!")
                 .range(labelRange)
-                .textAttributes(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)
+                // .textAttributes(DefaultLanguageHighlighterColors.HIGHLIGHTED_REFERENCE)
                 .create()
         else
             h.newSilentAnnotation(HighlightSeverity.INFORMATION)

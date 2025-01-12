@@ -45,14 +45,14 @@ class SpockLabelAnnotatorTest : LightPlatformCodeInsightFixture4TestCase() {
             
             class <info descr="null">MySpec</info> extends <info descr="null">Specification</info> {
                 def 'should do something'() {
-                    <error descr="Spock labels should have a title!"><info descr="null">given</info>:</error>
+                    <warning descr="Spock labels should have a title!"><info descr="null">given</info>:</warning>
                     def <info descr="null">foo</info> = 1
                     def <info descr="null">bar</info> = 2
                     
-                    <error descr="Spock labels should have a title!"><info descr="null">when</info>:</error>
+                    <warning descr="Spock labels should have a title!"><info descr="null">when</info>:</warning>
                     def <info descr="null">baz</info> = <info descr="null">foo</info> + <info descr="null">bar</info>
                     
-                    <error descr="Spock labels should have a title!"><info descr="null">then</info>:</error>
+                    <warning descr="Spock labels should have a title!"><info descr="null">then</info>:</warning>
                     <info descr="null">baz</info> == 3
                 }
             }
