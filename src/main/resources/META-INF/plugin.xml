@@ -12,6 +12,16 @@
 
         <annotator language="Groovy" implementationClass="com.akefirad.groom.spock.SpockLabelAnnotator"/>
         <lang.foldingBuilder language="Groovy" implementationClass="com.akefirad.groom.spock.SpockFoldingBuilder"/>
+
+        <codeInsight.declarativeInlayProvider
+                language="Groovy"
+                isEnabledByDefault="true"
+                implementationClass="com.akefirad.groom.spock.AssertInlayHintsProvider"
+                providerId="com.akefirad.groom.spock"
+                bundle="messages.Bundle"
+                nameKey="settings.groom.inlay.spock.implicit.assertion.name"
+                group="OTHER_GROUP"
+        />
     </extensions>
 
     <applicationListeners>

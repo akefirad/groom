@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
-import com.intellij.psi.util.elementType
 import org.jetbrains.plugins.groovy.lang.parser.GroovyElementTypes
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.auxiliary.GrListOrMap
@@ -46,11 +45,11 @@ class GroovyFoldingBuilder : CustomFoldingBuilder() {
     private fun GrListOrMap.isSingleLine() = !text.contains("\n") // TODO: find a better way to do these!
     private fun GrListOrMap.hasLeftOpen() = !text.trim().endsWith("]") // TODO: find a better way to do these!
 
-    override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String {
+    public override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String {
         val selected = node.getChildren(TokenSet.create(GroovyElementTypes.LIST_OR_MAP))
         assert(selected.size == 1) { "Unexpected number of children: ${selected.size}" }
         val psi = selected.single().psi
-        check(psi is GrListOrMap) { "Unexpected type: ${psi.elementType}" }
+        check(psi is GrListOrMap) { "Unexpected type: ${psi.javaClass}" }
         return if (psi.isMap) "[...:...]" else "[...]"
     }
 

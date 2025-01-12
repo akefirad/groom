@@ -6,14 +6,13 @@ import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.plugins.groovy.lang.parser.GroovyElementTypes
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
 
-class SpockFoldingBuilder : CustomFoldingBuilder(), DumbAware {
+class SpockFoldingBuilder : CustomFoldingBuilder() {
 
     override fun buildLanguageFoldRegions(
         descriptors: MutableList<FoldingDescriptor>,
