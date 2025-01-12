@@ -43,5 +43,9 @@ enum class SpockSpecLabel {
 
     companion object {
         private fun labels(e: SpockSpecLabel, vararg es: SpockSpecLabel): EnumSet<SpockSpecLabel> = EnumSet.of(e, *es)
+
+        fun isLabel(text: String): Boolean = entries.any { it.label == text }
+
+        fun ofLabel(text: String): SpockSpecLabel = valueOf(text.uppercase())
     }
 }
