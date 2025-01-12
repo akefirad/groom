@@ -18,17 +18,19 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlo
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrOpenBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssignmentExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpression
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.literals.GrLiteral
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
 
 class AssertInlayHintsProvider : InlayHintsProvider, PossiblyDumbAware {
+
+    override fun isDumbAware() = false
 
     override fun createCollector(file: PsiFile, editor: Editor): InlayHintsCollector? {
         if (file.hasAnySpecification() == false) return null
         return AssertInlayHintsCollector()
     }
 
-    override fun isDumbAware() = false
 }
 
 class AssertInlayHintsCollector : SharedBypassCollector {
@@ -49,7 +51,12 @@ class AssertInlayHintsCollector : SharedBypassCollector {
 
         while (children.hasNext()) {
             val e = children.next()
-            if (e.isSpockLabel() && e.isContinuationLabel() == false) return
+            if (e.isSpockLabel()) {
+                if (e.isContinuationLabel() == false && e.children.single() is GrLiteral)
+                    return
+                else if (e.children.single() !is GrLiteral)
+                    collectFromExpectationBlockChildren(e.children.iterator(), sink)
+            }
             if (e !is GrExpression || e is GrAssignmentExpression) continue
             if (e.isInteractionExpression()) continue
             if (e.isVerifyAllExpression() || e.isWithExpression()) {
@@ -74,3 +81,4 @@ class AssertInlayHintsCollector : SharedBypassCollector {
     private fun GrExpression.isMethodCallExpression(method: String) =
         this is GrMethodCallExpression && callReference?.methodName == method
 }
+

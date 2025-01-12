@@ -33,7 +33,7 @@ class AssertInlayHintsProviderTest : LightPlatformCodeInsightFixture4TestCase() 
             }
             
             class MySpec extends Specification {
-                private final static int ONE = 1
+                private final static Object obj = new Object()
                 
                 def 'something'() {
                     def assignment = 1 // should not be touched
@@ -72,6 +72,9 @@ class AssertInlayHintsProviderTest : LightPlatformCodeInsightFixture4TestCase() 
                     interaction {
                         add(foo, bar)
                     }
+                    
+                    and: // without title
+                    /*<# assert #>*/obj != null
                     
                     when: 'should not touch following when blocks'
                     equals(foo, bar)
