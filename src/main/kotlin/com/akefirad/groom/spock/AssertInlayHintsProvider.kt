@@ -1,6 +1,5 @@
 package com.akefirad.groom.spock
 
-import com.akefirad.groom.spock.SpockSpecUtils.hasAnySpecification
 import com.akefirad.groom.spock.SpockSpecUtils.isSpeckLabel
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayTreeSink
@@ -11,6 +10,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.PossiblyDumbAware
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrClosableBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrOpenBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssignmentExpression
@@ -20,14 +20,16 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMe
 import org.jetbrains.plugins.groovy.lang.psi.util.isWhiteSpaceOrNewLine
 
 class AssertInlayHintsProvider : InlayHintsProvider, PossiblyDumbAware {
-    override fun createCollector(file: PsiFile, editor: Editor) =
-        if (file.hasAnySpecification()) AssertInlayHintsCollector() else null
+    override fun createCollector(file: PsiFile, editor: Editor): AssertInlayHintsCollector? {
+        // TODO: check if it's an actual test file!
+        return if (file is GroovyFile) AssertInlayHintsCollector() else null
+    }
 }
 
 class AssertInlayHintsCollector : SharedBypassCollector {
 
     override fun collectFromElement(element: PsiElement, sink: InlayTreeSink) {
-        if (element is GrMethod)
+        if (element is GrMethod) // TODO: check if it's a test method!
             collectFromMethod(element, sink)
     }
 
