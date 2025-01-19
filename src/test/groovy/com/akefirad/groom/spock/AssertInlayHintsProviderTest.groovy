@@ -1,7 +1,6 @@
 package com.akefirad.groom.spock
 
-import com.akefirad.groom.test.spock.util.Specification
-import com.intellij.codeInsight.hints.InlayDumpUtil
+import com.akefirad.groom.testing.InlayDumpUtil
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayProviderPassInfo
 import com.intellij.codeInsight.hints.declarative.impl.DeclarativeInlayHintsPass
@@ -14,157 +13,267 @@ import org.intellij.lang.annotations.Language
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.junit.Test
 
-class AssertInlayHintsProviderTest : LightPlatformCodeInsightFixture4TestCase() {
+import static com.akefirad.groom.test.spock.util.SpockSpecification.CODE as SpecificationClass
 
-    private lateinit var elementFactory: GroovyPsiElementFactory
+class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestCase {
 
-    override fun setUp() {
+    private GroovyPsiElementFactory elementFactory
+
+    void setUp() {
         super.setUp()
         elementFactory = GroovyPsiElementFactory.getInstance(project)
     }
 
-    @Test // This is a complete test, don't remove it!
-    fun `provider should provide implicit assert`() {
-        val text = """
-            ${Specification.CODE}
-            
-            abstract class MyBase {
-                abstract void add(a, b)
-            }
-            
+    @Test
+    void 'provider should provide implicit assert to simple spec'() {
+        def text = """
+            $SpecificationClass
+
             class MySpec extends Specification {
-                private final static int ONE = 1
-                
-                def 'something'() {
-                    def assignment = 1 // should not be touched
-                    
-                    given: 'a foo'
+                def 'test with untitled labels'() {
+                    given:
                     def foo = 1
-                    
-                    and: 'a bar'
-                    def bar = 2
-                    bar == 2
-            
+                    def bar = 2 
+
+                    when:
+                    def baz = foo + bar
+                    add(foo, bar)
+
+                    then:
+                    /*<# assert #>*/'literal string'
+                    /*<# assert #>*/true // literal boolean
+                    /*<# assert #>*/bar == foo
+                    /*<# assert #>*/equals(baz, foo + bar)
+                }
+
+                def 'test with untitled labels'() {
+                    given: 'a foo and bar'
+                    def foo = 1
+                    def bar = 2 
+
                     when: 'foo + bar'
-                    equals(foo, bar)
-                    def baz = add(foo, bar)
-                    baz == 3
-                    
-                    and: 'another when'
-                    equals(foo, bar)
-                    def quax = add(foo, bar)
-                    quax == 3
-            
-                    then: 'should add assert to simple expressions'
-                    /*<# assert #>*/baz == 3
-                    /*<# assert #>*/baz == add(foo, bar)
-                    
-                    and: 'should add assert to method calls'
-                    /*<# assert #>*/add(foo, bar) == 3
-                    /*<# assert #>*/add(foo, bar)
-                    /*<# assert #>*/equals(foo, bar)
-                    
-                    and: 'should not add assert to assignments'
-                    assignment = 1
-                    assignment = 2 
-                    
-                    and: 'should not add assert to interactions'
-                    interaction {
-                        add(foo, bar)
-                    }
-                    
-                    when: 'should not touch following when blocks'
-                    equals(foo, bar)
-                    def baz2 = add(foo, bar)
-                    baz2 == 3
-                    
-                    and: 'should not touch following when blocks'
-                    equals(foo, bar)
-                    def quax2 = add(foo, bar)
-                    quax2 == 3
-            
-                    expect: 'should add assert to simple expressions'
-                    /*<# assert #>*/3 == 3
-                    /*<# assert #>*/3 == add(foo, bar)
-                    /*<# assert #>*/!equals(1, 2)
-                    
-                    and: 'even for simple expressions'
-                    /*<# assert #>*/true == true
-                    /*<# assert #>*/true != false
-                    
-                    and: 'even for null'
-                    /*<# assert #>*/null
-                }
-                
-                def add(a, b) {
-                    a + b
-                }
-                
-                def equals(a, b) {
-                    a == b
+                    def baz = foo + bar
+                    add(foo, bar)
+
+                    then: 'should be equal'
+                    /*<# assert #>*/'literal string'
+                    /*<# assert #>*/true // literal boolean
+                    /*<# assert #>*/bar == foo
+                    /*<# assert #>*/equals(baz, foo + bar)
                 }
             }
-        """.trimIndent()
+        """.stripIndent()
         testAnnotations(text)
     }
 
     @Test
-    fun `provider should provide implicit assert when using verifyAll`() {
-        val text = """
-            ${Specification.CODE}
+    void 'provider should provide implicit assert to simple spec with repeated labels'() {
+        def text = """
+            $SpecificationClass
+
+            class MySpec extends Specification {
+                def 'test with untitled labels'() {
+                    given:
+                    def foo = 1
+                    def bar = 2 
+
+                    when:
+                    def baz = foo + bar
+                    add(foo, bar)
+
+                    then:
+                    /*<# assert #>*/'literal string'
+                    /*<# assert #>*/true // literal boolean
+                    /*<# assert #>*/bar == foo
+                    /*<# assert #>*/equals(baz, foo + bar)
+
+                    when:
+                    def baz2 = foo + bar
+                    add(foo, bar)
+
+                    then:
+                    /*<# assert #>*/'literal string'
+                    /*<# assert #>*/true // literal boolean
+                    /*<# assert #>*/bar == foo
+                    /*<# assert #>*/equals(baz, foo + bar)
+                }
+
+                def 'test with titled labels'() {
+                    given: 'a foo and bar'
+                    def foo = 1
+                    def bar = 2 
+
+                    when: 'foo + bar'
+                    def baz = foo + bar
+                    add(foo, bar)
+
+                    then: 'should be equal'
+                    /*<# assert #>*/'literal string'
+                    /*<# assert #>*/true // literal boolean
+                    /*<# assert #>*/bar == foo
+                    /*<# assert #>*/equals(baz, foo + bar)
+
+                    when: 'foo + bar'
+                    def baz2 = foo + bar
+                    add(foo, bar)
+
+                    then: 'should be equal'
+                    /*<# assert #>*/'literal string'
+                    /*<# assert #>*/true // literal boolean
+                    /*<# assert #>*/bar == foo
+                    /*<# assert #>*/equals(baz, foo + bar)
+                }
+            }
+        """.stripIndent()
+        testAnnotations(text)
+    }
+
+    @Test
+    void 'provider should provide implicit assert'() {
+        def text = """
+            $SpecificationClass
+
+            abstract class MyBase {
+                abstract void add(a, b)
+            }
+
             class MySpec extends Specification {
                 private final static int ONE = 1
-            
+
+                def 'something'() {
+                    def assignment = 1 // should not be touched
+
+                    given: 'a foo'
+                    def foo = 1
+
+                    and: 'a bar'
+                    def bar = 2
+                    bar == 2
+
+                    when: 'foo + bar'
+                    baz == 3
+                    add(foo, bar)
+
+                    and: 'another when'
+                    quax == 3
+                    equals(foo, bar)
+                    add(foo, bar)
+
+                    then: 'should add assert to simple expressions'
+                    /*<# assert #>*/baz == 3
+                    /*<# assert #>*/baz == add(foo, bar)
+
+                    and: 'should add assert to method calls'
+                    /*<# assert #>*/add(foo, bar) == 3
+                    /*<# assert #>*/add(foo, bar)
+                    /*<# assert #>*/equals(foo, bar)
+
+                    and: 'should not add assert to assignments'
+                    assignment = 1
+                    assignment = 2
+
+                    and:
+                    /*<# assert #>*/'should add assert to untitled continuation'
+
+                    and: 'should not add assert to interactions'
+                    interaction {
+                        add(foo, bar)
+                    }
+
+                    when: 'should not touch following when blocks'
+                    equals(foo, bar)
+                    def baz2 = add(foo, bar)
+                    baz2 == 3
+
+                    and: 'should not touch following when blocks'
+                    equals(foo, bar)
+                    def quax2 = add(foo, bar)
+                    quax2 == 3
+
+                    expect: 'should add assert to simple expressions'
+                    /*<# assert #>*/3 == 3
+                    /*<# assert #>*/3 == add(foo, bar)
+                    /*<# assert #>*/!equals(1, 2)
+
+                    and: 'even for simple expressions'
+                    /*<# assert #>*/true == true
+                    /*<# assert #>*/true != false
+
+                    and: 'even for null'
+                    /*<# assert #>*/null
+                }
+
+                def add(a, b) {
+                    a + b
+                }
+
+                def equals(a, b) {
+                    a == b
+                }
+            }
+        """.stripIndent()
+        testAnnotations(text)
+    }
+
+    @Test
+    void 'provider should provide implicit assert when using verifyAll'() {
+        def text = """
+            $SpecificationClass
+
+            class MySpec extends Specification {
+                private final static int ONE = 1
+
                 def 'something'() {
                     given: 'a foo and bar'
                     def foo = 1
-            
+
                     when: 'foo + bar'
                     def baz = add(foo, bar)
-                    
+
                     and: 'another when'
                     def quax = add(foo, bar)
-            
+
                     then: 'should be 3'
                     verifyAll {
                         /*<# assert #>*/baz == 3
                         /*<# assert #>*/baz == add(foo, bar)
                     }
-                    
+
                     and: 'should be 3'
                     verifyAll(baz) {
                         /*<# assert #>*/add(foo, bar) == 3
                         /*<# assert #>*/add(foo, bar)
                     }
-                    
+
                     and: 'an error'
                     verifyAll()
                 }
             }
-        """.trimIndent()
+        """.stripIndent()
         testAnnotations(text)
     }
 
     @Test
-    fun `provider should provide implicit assert when using with`() {
-        val text = """
-            ${Specification.CODE}
+    void 'provider should provide implicit assert when using with'() {
+        def text = """
+            $SpecificationClass
+
             class MySpec extends Specification {
                 private final static int ONE = 1
-            
+
                 def 'something'() {
                     given: 'a foo and bar'
                     def foo = 1
-            
+
                     when: 'foo + bar'
                     def baz = add(foo, bar)
-            
+
                     then: 'should be 3'
                     with(baz) {
                         /*<# assert #>*/baz == 3
                         /*<# assert #>*/baz == add(foo, bar)
                     }
-                    
+
                     and: 'should be 3'
                     verifyAll {
                         with(baz) {
@@ -172,38 +281,39 @@ class AssertInlayHintsProviderTest : LightPlatformCodeInsightFixture4TestCase() 
                             /*<# assert #>*/baz == add(foo, bar)
                         }
                     }
-                    
+
                     and: 'should be 3'
                     with(baz) {
                         /*<# assert #>*/add(foo, bar) == 3
                         /*<# assert #>*/add(foo, bar)
                     }
-                    
+
                     and: 'an error'
                     with(baz)
                 }
             }
-        """.trimIndent()
+        """.stripIndent()
         testAnnotations(text)
     }
 
     @Test
-    fun `provider should not provide implicit assert when assert is present`() {
-        val text = """
-            ${Specification.CODE}
+    void 'provider should not provide implicit assert when assert is present'() {
+        def text = """
+            $SpecificationClass
+
             class MySpec extends Specification {
                 private final static int ONE = 1
-            
+
                 def 'something'() {
                     given: 'a foo and bar'
                     def foo = 1
-            
+
                     when: 'foo + bar'
                     def baz = add(foo, bar)
-            
+
                     then: 'should be 3'
                     assert baz == 3
-                    
+
                     and: 'should be 3'
                     with(baz) {
                         assert baz == add(foo, bar)
@@ -211,7 +321,7 @@ class AssertInlayHintsProviderTest : LightPlatformCodeInsightFixture4TestCase() 
                             assert baz == 3
                         }
                     }
-                    
+
                     and: 'should be 3'
                     verifyAll {
                         assert baz == 3
@@ -221,49 +331,52 @@ class AssertInlayHintsProviderTest : LightPlatformCodeInsightFixture4TestCase() 
                     }
                 }
             }
-        """.trimIndent()
+        """.stripIndent()
         testAnnotations(text)
     }
 
-    private fun testAnnotations(@Language("Groovy") text: String) {
-        doTestProvider("MySpec.groovy", text, AssertInlayHintsProvider())
+    private void testAnnotations(@Language("Groovy") String text) {
+        doTestProvider("MySpec.groovy", text, new AssertInlayHintsProvider())
     }
 
-    @Suppress("UnstableApiUsage")
-    private fun doTestProvider(
-        fileName: String,
-        expectedText: String,
-        provider: InlayHintsProvider,
-        enabledOptions: Map<String, Boolean> = emptyMap(),
-        verifyHintsPresence: Boolean = false,
+    @SuppressWarnings("UnstableApiUsage")
+    private void doTestProvider(
+        String fileName,
+        String expectedText,
+        InlayHintsProvider provider,
+        Map<String, Boolean> enabledOptions = [:],
+        boolean verifyHintsPresence = false
     ) {
         if (verifyHintsPresence) {
-            InlayHintsProviderTestCase.verifyHintsPresence(expectedText)
+            InlayHintsProviderTestCase.Companion.verifyHintsPresence(expectedText)
         }
-        val sourceText = InlayDumpUtil.removeHints(expectedText)
+        def sourceText = InlayDumpUtil.removeHints(expectedText)
         myFixture.configureByText(fileName, sourceText)
-        val file = myFixture.file!!
-        val editor = myFixture.editor
-        val providerInfo = InlayProviderPassInfo(provider, "provider.id", enabledOptions)
-        val pass = DeclarativeInlayHintsPass(file, editor, listOf(providerInfo), isPreview = false)
+        def file = myFixture.file
+        def editor = myFixture.editor
+        def providerInfo = new InlayProviderPassInfo(provider, "provider.id", enabledOptions)
+        def pass = new DeclarativeInlayHintsPass(file, editor, [providerInfo], false, false)
         applyPassAndCheckResult(pass, sourceText, expectedText)
     }
 
-    @Suppress("UnstableApiUsage")
-    private fun applyPassAndCheckResult(
-        pass: DeclarativeInlayHintsPass,
-        previewText: String,
-        expectedText: String,
+    @SuppressWarnings("UnstableApiUsage")
+    private void applyPassAndCheckResult(
+        DeclarativeInlayHintsPass pass,
+        String previewText,
+        String expectedText
     ) {
-        pass.doCollectInformation(EmptyProgressIndicator())
+        pass.doCollectInformation(new EmptyProgressIndicator())
         pass.applyInformationToEditor()
-
-        val dump = InlayDumpUtil.dumpHintsInternal(previewText, renderer = { renderer, _ ->
-            renderer as DeclarativeInlayRenderer
-            renderer.presentationList.getEntries()
-                .joinToString(separator = "|") { entry -> (entry as TextInlayPresentationEntry).text }
-        }, file = myFixture.file!!, editor = myFixture.editor, document = myFixture.getDocument(myFixture.file!!))
+        def file = myFixture.file
+        def doc = myFixture.getDocument(file)
+        def editor = myFixture.editor
+        def dump = InlayDumpUtil.dumpHintsInternal(previewText, file, editor, doc) { r, _ ->
+            (r as DeclarativeInlayRenderer).presentationList
+                .entries
+                .collect { it as TextInlayPresentationEntry }
+                .collect { it.text }
+                .join("|")
+        }
         assertEquals(expectedText.trim(), dump.trim())
     }
-
 }

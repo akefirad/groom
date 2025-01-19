@@ -1,22 +1,23 @@
 package com.akefirad.groom.spock
 
-import com.akefirad.groom.spock.SpockSpecUtils.hasAnySpecification
 import com.intellij.mock.MockPsiFile
 import com.intellij.mock.MockPsiManager
 import com.intellij.mock.MockVirtualFile
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
 import org.junit.Test
 
-class SpockSpecUtilsTest : LightPlatformCodeInsightFixture4TestCase() {
+import static com.akefirad.groom.spock.SpockSpecUtils.hasAnySpecification
+
+class SpockSpecUtilsTest extends LightPlatformCodeInsightFixture4TestCase {
 
     @Test
-    fun `hasAnySpecification should return false for non-Groovy file`() {
+    void 'hasAnySpecification should return false for non-Groovy file'() {
         // given:
-        val manager = MockPsiManager(project)
-        val file = MockPsiFile(MockVirtualFile("NonGroovy.txt"), manager)
+        def manager = new MockPsiManager(project)
+        def file = new MockPsiFile(new MockVirtualFile("NonGroovy.txt"), manager)
 
         // when:
-        val result = file.hasAnySpecification()
+        def result = hasAnySpecification(file)
 
         // then:
         assertFalse(result)

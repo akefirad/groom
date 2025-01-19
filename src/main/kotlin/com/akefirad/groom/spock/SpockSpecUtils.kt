@@ -4,10 +4,12 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrLabeledStatement
+import kotlin.contracts.contract
 
 object SpockSpecUtils {
-    const val SPOCK_SPEC_CLASS: String = "spock.lang.Specification"
+    private const val SPOCK_SPEC_CLASS: String = "spock.lang.Specification"
 
+    @JvmStatic
     fun PsiElement.hasAnySpecification(): Boolean {
         return this is GroovyFile && children
             .filterIsInstance<PsiClass>()
@@ -25,14 +27,11 @@ object SpockSpecUtils {
         generateSequence(clazz) { it.superClass }
             .any { it.qualifiedName == SPOCK_SPEC_CLASS }
 
-    fun PsiElement.isSpockLabel() =
-        this is GrLabeledStatement && SpockSpecLabel.entries.any { it.label == name }
-
-    fun PsiElement.isContinuationLabel() = isAnyOf(SpockSpecLabel.AND)
-
-    fun PsiElement.isExpectationLabel() = isAnyOf(SpockSpecLabel.THEN, SpockSpecLabel.EXPECT)
-
-    private fun PsiElement.isAnyOf(label: SpockSpecLabel, vararg others: SpockSpecLabel) =
-        this is GrLabeledStatement && setOf(label, *others).any { it.label == name }
+    fun PsiElement.isSpeckLabel(): Boolean {
+        contract {
+            returns(true) implies (this@isSpeckLabel is GrLabeledStatement)
+        }
+        return this is GrLabeledStatement && SpecLabel.entries.any { it.label == name }
+    }
 
 }

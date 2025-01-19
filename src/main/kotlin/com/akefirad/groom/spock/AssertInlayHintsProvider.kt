@@ -1,10 +1,7 @@
 package com.akefirad.groom.spock
 
 import com.akefirad.groom.spock.SpockSpecUtils.hasAnySpecification
-import com.akefirad.groom.spock.SpockSpecUtils.isContinuationLabel
-import com.akefirad.groom.spock.SpockSpecUtils.isExpectationLabel
-import com.akefirad.groom.spock.SpockSpecUtils.isSpockLabel
-import com.intellij.codeInsight.hints.declarative.InlayHintsCollector
+import com.akefirad.groom.spock.SpockSpecUtils.isSpeckLabel
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayTreeSink
 import com.intellij.codeInsight.hints.declarative.InlineInlayPosition
@@ -20,53 +17,72 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrAssign
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.path.GrMethodCallExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
+import org.jetbrains.plugins.groovy.lang.psi.util.isWhiteSpaceOrNewLine
 
 class AssertInlayHintsProvider : InlayHintsProvider, PossiblyDumbAware {
-
-    override fun createCollector(file: PsiFile, editor: Editor): InlayHintsCollector? {
-        if (file.hasAnySpecification() == false) return null
-        return AssertInlayHintsCollector()
-    }
-
-    override fun isDumbAware() = false
+    override fun createCollector(file: PsiFile, editor: Editor) =
+        if (file.hasAnySpecification()) AssertInlayHintsCollector() else null
 }
 
 class AssertInlayHintsCollector : SharedBypassCollector {
+
     override fun collectFromElement(element: PsiElement, sink: InlayTreeSink) {
-        if (element !is GrMethod) return
-        val body = element.children.find { it is GrOpenBlock } as? GrOpenBlock ?: return
-        val children = body.children.iterator()
-        while (children.hasNext()) {
-            while (children.hasNext() && children.next().isExpectationLabel() == false) continue
-            collectFromExpectationBlockChildren(children, sink)
+        if (element is GrMethod)
+            collectFromMethod(element, sink)
+    }
+
+    private fun collectFromMethod(m: GrMethod, sink: InlayTreeSink) {
+        m.children.forEach {
+            if (it is GrOpenBlock) collectFromBlock(it, sink)
         }
     }
 
-    private fun collectFromExpectationBlockChildren(children: Iterator<PsiElement>, sink: InlayTreeSink) {
+    private fun collectFromBlock(b: GrOpenBlock, sink: InlayTreeSink) {
+        var label: SpecLabelElement? = null
+        for (c in b.children) {
+            if (c.isWhiteSpaceOrNewLine()) {
+                continue
+            }
+
+            if (c.isSpeckLabel()) {
+                val current = SpecLabelElement.ofLabel(c)
+                if (current.isContinuation && label?.isExpectation == true) {
+                    if (current.hasTitle == false) {
+                        collectFromExpectationBlockChildren(c.lastChild, sink)
+                    }
+                } else if (current.isExpectation) {
+                    if (current.hasTitle == false) {
+                        collectFromExpectationBlockChildren(c.lastChild, sink)
+                    }
+                    label = current
+                } else {
+                    label = null
+                }
+            } else if (label?.isExpectation == true) {
+                collectFromExpectationBlockChildren(c, sink)
+            }
+
+        }
+    }
+
+    private fun collectFromExpectationBlockChildren(e: PsiElement, sink: InlayTreeSink) {
         class AssertInlayHint : (PresentationTreeBuilder) -> Unit {
             override fun invoke(builder: PresentationTreeBuilder) = builder.text("assert")
         }
 
-        while (children.hasNext()) {
-            val e = children.next()
-            if (e.isSpockLabel() && e.isContinuationLabel() == false) return
-            if (e !is GrExpression || e is GrAssignmentExpression) continue
-            if (e.isInteractionExpression()) continue
-            if (e.isVerifyAllExpression() || e.isWithExpression()) {
-                collectFromMethodCallExpression(e, sink)
-            } else {
-                val position = InlineInlayPosition(e.textRange.startOffset, relatedToPrevious = false)
-                sink.addPresentation(position, hasBackground = true, builder = AssertInlayHint())
-            }
+        if (e !is GrExpression || e is GrAssignmentExpression) return
+        if (e.isSpockInteractionExpression()) return
+
+        if (e.isVerifyAllExpression() || e.isWithExpression()) {
+            val closure = e.lastChild as? GrClosableBlock ?: return
+            closure.children.forEach { collectFromExpectationBlockChildren(it, sink) }
+        } else {
+            val position = InlineInlayPosition(e.textRange.startOffset, relatedToPrevious = false)
+            sink.addPresentation(position, hasBackground = true, builder = AssertInlayHint())
         }
     }
 
-    private fun collectFromMethodCallExpression(e: GrExpression, sink: InlayTreeSink) {
-        val closure = e.lastChild as? GrClosableBlock ?: return
-        collectFromExpectationBlockChildren(closure.children.iterator(), sink)
-    }
-
-    private fun GrExpression.isInteractionExpression() = isMethodCallExpression("interaction")
+    private fun GrExpression.isSpockInteractionExpression() = isMethodCallExpression("interaction")
     private fun GrExpression.isVerifyAllExpression() = isMethodCallExpression("verifyAll")
     private fun GrExpression.isWithExpression() = isMethodCallExpression("with")
 

@@ -1,9 +1,11 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
+    groovy
 
     alias(libs.plugins.kotlin) // Kotlin support
     alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
@@ -34,6 +36,10 @@ repositories {
 dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
+    testImplementation(libs.groovy)
+
+    // TODO: use Mockito!
+    testImplementation("org.easymock:easymock:5.5.0")
 
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
@@ -128,6 +134,10 @@ kover {
 }
 
 tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
+    }
+
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
     }
