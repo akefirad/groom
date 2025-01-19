@@ -26,7 +26,7 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
 
     @Test
     void 'provider should provide implicit assert to simple spec'() {
-        def text = """
+        def code = """
             $SpecificationClass
 
             class MySpec extends Specification {
@@ -63,12 +63,12 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                 }
             }
         """.stripIndent()
-        testAnnotations(text)
+        testAnnotations(code)
     }
 
     @Test
     void 'provider should provide implicit assert to simple spec with repeated labels'() {
-        def text = """
+        def code = """
             $SpecificationClass
 
             class MySpec extends Specification {
@@ -125,12 +125,12 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                 }
             }
         """.stripIndent()
-        testAnnotations(text)
+        testAnnotations(code)
     }
 
     @Test
     void 'provider should provide implicit assert'() {
-        def text = """
+        def code = """
             $SpecificationClass
 
             abstract class MyBase {
@@ -212,12 +212,12 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                 }
             }
         """.stripIndent()
-        testAnnotations(text)
+        testAnnotations(code)
     }
 
     @Test
     void 'provider should provide implicit assert when using verifyAll'() {
-        def text = """
+        def code = """
             $SpecificationClass
 
             class MySpec extends Specification {
@@ -250,12 +250,12 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                 }
             }
         """.stripIndent()
-        testAnnotations(text)
+        testAnnotations(code)
     }
 
     @Test
     void 'provider should provide implicit assert when using with'() {
-        def text = """
+        def code = """
             $SpecificationClass
 
             class MySpec extends Specification {
@@ -293,12 +293,12 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                 }
             }
         """.stripIndent()
-        testAnnotations(text)
+        testAnnotations(code)
     }
 
     @Test
     void 'provider should not provide implicit assert when assert is present'() {
-        def text = """
+        def code = """
             $SpecificationClass
 
             class MySpec extends Specification {
@@ -332,11 +332,37 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                 }
             }
         """.stripIndent()
-        testAnnotations(text)
+        testAnnotations(code)
     }
 
-    private void testAnnotations(@Language("Groovy") String text) {
-        doTestProvider("MySpec.groovy", text, new AssertInlayHintsProvider())
+    @Test
+    void 'provider should do nothing when file is not GroovyFile'() {
+        given:
+            def code = '''
+            class SampleSpec extends Specification {
+                void test_method() <fold text='{...}'>{
+                    given: "some given block"
+                    var foo = 'foo';
+            
+                    when: "some when block"
+                    var baz = foo + bar;
+            
+                    then: "some then block"
+                    baz == 'foobar';
+                }</fold>
+            }
+
+            '''.stripIndent()
+
+        when:
+            doTestProvider("MySpec.java", code, new AssertInlayHintsProvider())
+
+        then:
+            true // TODO: How to check it's not folded?
+    }
+
+    private void testAnnotations(@Language("Groovy") String code) {
+        doTestProvider("MySpec.groovy", code, new AssertInlayHintsProvider())
     }
 
     @SuppressWarnings("UnstableApiUsage")
