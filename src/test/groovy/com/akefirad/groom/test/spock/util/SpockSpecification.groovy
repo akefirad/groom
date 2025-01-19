@@ -1,7 +1,7 @@
 package com.akefirad.groom.test.spock.util
 
-object Specification {
-    const val CODE = """
+class SpockSpecification {
+    public final static String CODE = '''
         /*
          * Copyright 2024 the original author or authors.
          *
@@ -356,7 +356,5 @@ object Specification {
             }
             SpockRuntime.verifyEach(things, namer, closure);
           }
-        }
-        
-    """
+        }'''.stripIndent()
 }

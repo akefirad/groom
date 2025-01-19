@@ -1,16 +1,21 @@
 package com.akefirad.groom.spock
 
-import com.akefirad.groom.spock.SpockSpecUtils.hasAnySpecification
-import com.akefirad.groom.spock.SpockSpecUtils.isSpockLabel
+import com.akefirad.groom.spock.SpockSpecUtils.isSpeckLabel
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.impl.source.tree.LeafPsiElement
-import org.jetbrains.plugins.groovy.lang.parser.GroovyElementTypes
+import com.intellij.refactoring.suggested.endOffset
+import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrLabeledStatement
+import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrOpenBlock
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
+import org.jetbrains.plugins.groovy.lang.psi.impl.statements.typedef.GrTypeDefinitionBodyBase.GrClassBody
+import org.jetbrains.plugins.groovy.lang.psi.util.isWhiteSpaceOrNewLine
+
 
 class SpockFoldingBuilder : CustomFoldingBuilder() {
 
@@ -20,59 +25,126 @@ class SpockFoldingBuilder : CustomFoldingBuilder() {
         document: Document,
         quick: Boolean,
     ) {
-        if (root.hasAnySpecification() == false) return
-        addSpockLabelFoldRegions(Context(), descriptors, root)
+        if (root !is GroovyFile) return
+        for (cls in root.classes) {
+            // val fw = TestFrameworks.detectFramework(cls)
+            // TODO: skip if not a (Spock) test class
+            descriptors.addAll(addSpockLabelFoldRegions(cls))
+        }
     }
 
-    // TODO: this is far from perfect, but it's a start! All edge cases need to be covered.
-    private fun addSpockLabelFoldRegions(c: Context, d: MutableList<FoldingDescriptor>, e: PsiElement) {
-        var ctx = c
-        for (child in e.children) {
-            if (child is GrMethod) {
-                ctx = ctx.copy(method = child)
-            } else if (child.isSpockLabel()) {
-                val children = child.children
-                val hasNothing = children.isEmpty() || children.first().isSpockLabel() // Can it be empty?
-                if (hasNothing == false)
-                    addSpockLabelFoldRegion(ctx, d, child)
+    private fun addSpockLabelFoldRegions(c: PsiClass): List<FoldingDescriptor> {
+        return c.children.flatMap {
+            when (it) {
+                is GrClassBody -> addSpockLabelFoldRegions(it)
+                else -> emptyList()
+            }
+        }
+    }
+
+    private fun addSpockLabelFoldRegions(b: GrClassBody): List<FoldingDescriptor> {
+        return b.children.flatMap {
+            when (it) {
+                is PsiClass -> addSpockLabelFoldRegions(it)
+                is GrMethod -> addSpockLabelFoldRegions(it)
+                else -> emptyList()
+            }
+        }
+    }
+
+    private fun addSpockLabelFoldRegions(m: GrMethod): List<FoldingDescriptor> {
+        return m.children.flatMap {
+            when (it) {
+                is GrOpenBlock -> addSpockLabelFoldRegions(m, it)
+                else -> emptyList()
+            }
+        }
+    }
+
+    private fun addSpockLabelFoldRegions(m: GrMethod, b: GrOpenBlock): List<FoldingDescriptor> {
+        val result = mutableListOf<FoldingContext>()
+        var ctx = FoldingContext()
+        for (c in b.children) {
+            if (c.endOffset >= m.endOffset) {
+                break
             }
 
-            addSpockLabelFoldRegions(ctx, d, child)
+            if (c.isWhiteSpaceOrNewLine()) {
+                continue
+            }
+
+            if (c.isSpeckLabel()) {
+                val label = SpecLabelElement.ofLabel(c)
+                ctx = if (label.isContinuation) {
+                    if (result.isEmpty()) {
+                        FoldingContext.from(label).also(result::add)
+                    } else {
+                        result.last().nested(label)
+                    }
+                } else {
+                    ctx.restart(label).also(result::add)
+                }
+            } else {
+                ctx.expand(c.textRange)
+            }
         }
+        return result.flatMap(FoldingContext::fold)
     }
-
-    private fun addSpockLabelFoldRegion(ctx: Context, d: MutableList<FoldingDescriptor>, e: PsiElement) {
-        var next = e.nextSibling
-
-        val start = e.textRange.startOffset
-        var end = e.textRange.endOffset
-
-        while (next != null && !(next.isSpockLabel())) {
-            if (!next.isWhiteSpace() && next.textRange.endOffset < ctx.methodEndOffset())
-                end = next.textRange.endOffset
-
-            next = next.nextSibling
-        }
-
-        if (end > start) {
-            val range = TextRange(start, end)
-            d.add(FoldingDescriptor(e.node, range))
-        }
-    }
-
-    private fun PsiElement.isWhiteSpace() =
-        this is LeafPsiElement && text.trim().isEmpty()
 
     override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String {
-        val hasTitle = node.lastChildNode.elementType == GroovyElementTypes.LITERAL
-        return if (hasTitle) node.text else (node.firstChildNode.text + ": ...")
+        val label = SpecLabelElement.ofLabel(node.psi as GrLabeledStatement)
+        return (label.name.label + if (label.hasTitle) " ${label.title}" else "...")
     }
 
     override fun isRegionCollapsedByDefault(node: ASTNode) = false
 
-    override fun isDumbAware() = false
+    private data class FoldingContext(
+        private val label: SpecLabelElement? = null,
+        private val nested: Boolean = false,
+        private val children: MutableList<FoldingContext> = mutableListOf(),
+    ) {
+        private var range: TextRange = label?.range ?: TextRange.EMPTY_RANGE
 
-    private data class Context(val method: PsiElement? = null) {
-        fun methodEndOffset() = method?.textRange?.endOffset ?: throw IllegalStateException()
+        fun restart(e: SpecLabelElement): FoldingContext {
+            return from(e)
+        }
+
+        fun expand(r: TextRange) {
+            if (label == null) return
+            range = range.let {
+                assert(it.endOffset <= r.startOffset)
+                TextRange(it.startOffset, r.endOffset)
+            }
+        }
+
+        fun nested(e: SpecLabelElement): FoldingContext {
+            assert(label != null) { "Label is null!" }
+            check(e.isContinuation) { "Expected a continuation label: $e" }
+            return from(e, true).also(children::add)
+        }
+
+        fun fold(): List<FoldingDescriptor> {
+            if (label == null) return emptyList()
+            val range = range
+            return buildList {
+                if (label.hasTitle) {
+                    add(FoldingDescriptor(label.element, range))
+                }
+
+                for (c in children) {
+                    addAll(c.fold())
+                }
+
+                if (children.isNotEmpty()) {
+                    val first = label.range.startOffset
+                    val last = children.last().range.endOffset
+                    add(FoldingDescriptor(label.element, TextRange(first, last)))
+                }
+            }
+        }
+
+        companion object {
+            fun from(e: SpecLabelElement, nested: Boolean = false) = FoldingContext(e, nested)
+        }
     }
 }
