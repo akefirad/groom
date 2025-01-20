@@ -9,11 +9,9 @@ import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestC
 import org.junit.Test
 
 import static com.akefirad.oss.easymock.EasyMock.mock
-import static org.easymock.EasyMock.anyObject
 import static org.easymock.EasyMock.expect
 import static org.easymock.EasyMock.replay
 import static org.easymock.EasyMock.verify
-
 
 class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase {
 
@@ -46,34 +44,17 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
     }
 
     @Test
-    void 'getLanguagePlaceholderText should fail when node has no list or map'() {
+    void 'getLanguagePlaceholderText should fail when node is not GrListOrMap'() {
         // given:
         def subject = new GroovyFoldingBuilder()
         def node = mock(ASTNode)
-        expect(node.getChildren(anyObject())).andReturn(new ASTNode[0])
+        expect(node.getPsi()).andReturn(mock(PsiElement))
         replay(node)
 
         // expect:
-        assertThrows(AssertionError) { subject.getLanguagePlaceholderText(node, new TextRange(0, 0)) }
+        assertThrows(IllegalStateException) { subject.getLanguagePlaceholderText(node, TextRange.EMPTY_RANGE) }
 
         // and:
         verify(node)
-    }
-
-    @Test
-    void 'getLanguagePlaceholderText should fail when node has non-list-map child'() {
-        // given:
-        def subject = new GroovyFoldingBuilder()
-        def node = mock(ASTNode)
-        def child = mock(ASTNode)
-        expect(child.psi).andReturn(mock(PsiElement))
-        expect(node.getChildren(anyObject())).andReturn(new ASTNode[]{child})
-        replay(node, child)
-
-        // expect:
-        assertThrows(IllegalStateException) { subject.getLanguagePlaceholderText(node, new TextRange(0, 0)) }
-
-        // and:
-        verify(node, child)
     }
 }

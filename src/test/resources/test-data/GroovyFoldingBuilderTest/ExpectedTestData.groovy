@@ -12,6 +12,9 @@ class SampleClass extends Specification <fold text='{...}'>{
 
             println([])
             println([ ])
+
+            println([], [])
+            println([ ], [ ])
     }</fold>
 
     def 'empty map should fold'() <fold text='{...}'>{
@@ -23,6 +26,9 @@ class SampleClass extends Specification <fold text='{...}'>{
 
             println([:])
             println([ : ])
+
+            println([:], [:])
+            println([ : ], [ : ])
     }</fold>
 
     def 'non-empty list should fold'() <fold text='{...}'>{
@@ -37,6 +43,15 @@ class SampleClass extends Specification <fold text='{...}'>{
                 1,
                 2,
             ]</fold>)
+
+            println([1, 2], [3, 4])
+            println(<fold text='[...]'>[
+                1,
+                2,
+            ]</fold>, <fold text='[...]'>[
+                1,
+                2,
+            ]</fold>)
      }</fold>
 
     def 'non-empty map should fold'() <fold text='{...}'>{
@@ -48,6 +63,15 @@ class SampleClass extends Specification <fold text='{...}'>{
 
             println([foo: 1, bar: 2])
             println(<fold text='[...:...]'>[
+                foo: 1,
+                bar: 2,
+            ]</fold>)
+
+            println([foo: 1, bar: 2], [baz: 3, qux: 4])
+            println(<fold text='[...:...]'>[
+                foo: 1,
+                bar: 2,
+            ]</fold>, <fold text='[...:...]'>[
                 foo: 1,
                 bar: 2,
             ]</fold>)
