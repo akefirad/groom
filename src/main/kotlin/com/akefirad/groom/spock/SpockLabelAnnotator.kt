@@ -1,5 +1,6 @@
 package com.akefirad.groom.spock
 
+import com.akefirad.groom.intellij.PsiElementExtensions.startOffset
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -19,7 +20,7 @@ class SpockLabelAnnotator : Annotator {
 
     private fun annotate(e: GrLabeledStatement, h: AnnotationHolder) {
         val label = SpecLabelElement.ofLabel(e)
-        val range = TextRange.from(e.textRange.startOffset, label.name.label.length + 1)
+        val range = TextRange.from(e.startOffset, label.name.label.length + 1)
             .let { if (label.hasTitle) it.union(e.lastChild.textRange) else it }
 
         h.newSilentAnnotation(HighlightSeverity.INFORMATION)

@@ -1,6 +1,6 @@
 package com.akefirad.groom.spock
 
-import com.akefirad.groom.testing.InlayDumpUtil
+import com.intellij.codeInsight.hints.InlayDumpUtil
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayProviderPassInfo
 import com.intellij.codeInsight.hints.declarative.impl.DeclarativeInlayHintsPass
@@ -365,7 +365,6 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
         doTestProvider("MySpec.groovy", code, new AssertInlayHintsProvider())
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void doTestProvider(
         String fileName,
         String expectedText,
@@ -376,7 +375,7 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
         if (verifyHintsPresence) {
             InlayHintsProviderTestCase.Companion.verifyHintsPresence(expectedText)
         }
-        def sourceText = InlayDumpUtil.removeHints(expectedText)
+        def sourceText = InlayDumpUtil.INSTANCE.removeHints(expectedText)
         myFixture.configureByText(fileName, sourceText)
         def file = myFixture.file
         def editor = myFixture.editor
@@ -385,7 +384,6 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
         applyPassAndCheckResult(pass, sourceText, expectedText)
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void applyPassAndCheckResult(
         DeclarativeInlayHintsPass pass,
         String previewText,
@@ -396,13 +394,21 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
         def file = myFixture.file
         def doc = myFixture.getDocument(file)
         def editor = myFixture.editor
-        def dump = InlayDumpUtil.dumpHintsInternal(previewText, file, editor, doc) { r, _ ->
-            (r as DeclarativeInlayRenderer).presentationList
-                .entries
-                .collect { it as TextInlayPresentationEntry }
-                .collect { it.text }
-                .join("|")
-        }
+        def dump = InlayDumpUtil.INSTANCE.dumpHintsInternal(
+            previewText,
+            null,
+            { r, _ ->
+                (r as DeclarativeInlayRenderer).presentationList
+                    .entries
+                    .collect { it as TextInlayPresentationEntry }
+                    .collect { it.text }
+                    .join("|")
+            },
+            file,
+            editor,
+            doc,
+            0,
+        )
         assertEquals(expectedText.trim(), dump.trim())
     }
 }

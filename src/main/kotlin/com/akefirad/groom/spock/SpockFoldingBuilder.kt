@@ -1,5 +1,6 @@
 package com.akefirad.groom.spock
 
+import com.akefirad.groom.intellij.PsiElementExtensions.endOffset
 import com.akefirad.groom.spock.SpockSpecUtils.isSpeckLabel
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
@@ -8,7 +9,6 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.refactoring.suggested.endOffset
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrLabeledStatement
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.blocks.GrOpenBlock
