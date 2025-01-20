@@ -1,5 +1,6 @@
 package com.akefirad.groom.spock
 
+import com.akefirad.groom.intellij.PsiElementExtensions.startOffset
 import com.akefirad.groom.spock.SpockSpecUtils.isSpeckLabel
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayTreeSink
@@ -79,7 +80,7 @@ class AssertInlayHintsCollector : SharedBypassCollector {
             val closure = e.lastChild as? GrClosableBlock ?: return
             closure.children.forEach { collectFromExpectationBlockChildren(it, sink) }
         } else {
-            val position = InlineInlayPosition(e.textRange.startOffset, relatedToPrevious = false)
+            val position = InlineInlayPosition(e.startOffset, relatedToPrevious = false)
             sink.addPresentation(position, hasBackground = true, builder = AssertInlayHint())
         }
     }

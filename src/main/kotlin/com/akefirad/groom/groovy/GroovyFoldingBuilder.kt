@@ -1,5 +1,7 @@
 package com.akefirad.groom.groovy
 
+import com.akefirad.groom.intellij.PsiElementExtensions.endOffset
+import com.akefirad.groom.intellij.PsiElementExtensions.startOffset
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
@@ -34,8 +36,8 @@ class GroovyFoldingBuilder : CustomFoldingBuilder() {
             if (child.isSingleLine()) continue
             if (child.hasLeftOpen()) continue
 
-            val start = child.textRange.startOffset
-            val end = child.textRange.endOffset
+            val start = child.startOffset
+            val end = child.endOffset
             val range = TextRange(start, end)
             d.add(FoldingDescriptor(e.node, range))
         }
