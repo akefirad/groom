@@ -49,7 +49,6 @@ data class SpecLabelElement(val element: GrLabeledStatement) {
     val title = element.title
     val hasTitle = title != null
     val isContinuation = name.isContinuation
-    val isExpectation = name.isExpectation
 
     override fun toString() = "$name${if (hasTitle) ": '$title'" else ""}"
 

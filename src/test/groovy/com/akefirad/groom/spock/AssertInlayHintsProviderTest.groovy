@@ -129,7 +129,7 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
     }
 
     @Test
-    void 'provider should provide implicit assert'() {
+    void 'provider should provide implicit assert for complex code'() {
         def code = """
             $SpecificationClass
 
@@ -297,6 +297,73 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
     }
 
     @Test
+    void 'provider should provide implicit assert for spock mocks'() {
+        def code = """
+            $SpecificationClass
+
+            class MySpec extends Specification {
+                def 'something'() {
+                    given: 'a foo and bar'
+                    def foo = 1
+                    def bar = mock(Object)
+
+                    when: 'foo + bar'
+                    def baz = add(foo, bar)
+
+                    then: 'should be 3'
+                    /*<# assert #>*/_ * bar.foo()
+                    /*<# assert #>*/1 * bar.foo()
+                    /*<# assert #>*/1 * bar.bar(foo)
+                    /*<# assert #>*/1 * bar.foo() >> 1
+                    /*<# assert #>*/1 * bar.bar(foo) >> 2
+                    
+                    and: 'nested assertions'
+                    /*<# assert #>*/_ * bar.foo {
+                        /*<# assert #>*/it.foo == 'foo'
+                    }                
+                    /*<# assert #>*/1 * bar.foo {
+                        /*<# assert #>*/it.foo == 'foo'
+                    }                
+
+                    and: 'nested verifyAll'
+                    /*<# assert #>*/1 * bar.foo {
+                        verifyAll(baz) {
+                            /*<# assert #>*/it.baz == 3
+                            /*<# assert #>*/it.baz == add(foo, bar)
+                        }
+                    }                
+
+                    and: 'nested with'
+                    /*<# assert #>*/1 * bar.foo {
+                        with(baz) {
+                            /*<# assert #>*/it.baz == 3
+                            /*<# assert #>*/it.baz == add(foo, bar)
+                        }
+                    }
+                    
+                    and: 'non-mock'
+                    /*<# assert #>*/1 + 2
+                    /*<# assert #>*/1 * 2
+                    /*<# assert #>*/1 + bar.foo()
+                    /*<# assert #>*/1.2 + bar.foo()
+                    /*<# assert #>*/foo.bar() + bar.foo()
+                    /*<# assert #>*/1.2 * bar.foo()
+                    /*<# assert #>*/1.2 * bar.foo {
+                        it.baz == 3
+                        with(baz) {
+                            it.baz == 3
+                        }
+                        verifyAll(baz) {
+                            it.baz == 3
+                        }
+                    }
+                }
+            }
+        """.stripIndent()
+        testAnnotations(code)
+    }
+
+    @Test
     void 'provider should not provide implicit assert when assert is present'() {
         def code = """
             $SpecificationClass
@@ -336,9 +403,11 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
     }
 
     @Test
-    void 'provider should do nothing when file is not GroovyFile'() {
+    void 'provider should do nothing when file is not spock specification'() {
         given:
             def code = '''
+            package foo.bar;
+            class Specification {}
             class SampleSpec extends Specification {
                 void test_method() <fold text='{...}'>{
                     given: "some given block"
@@ -351,7 +420,6 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                     baz == 'foobar';
                 }</fold>
             }
-
             '''.stripIndent()
 
         when:
