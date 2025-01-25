@@ -7,25 +7,29 @@
 # - Create a draft release.
 
 name: Build
+
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read # This is required for actions/checkout
+  pull-requests: write
+
 jobs:
   build:
-    name: Build
+    name: Build Code
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.properties.outputs.version }}
       changelog: ${{ steps.properties.outputs.changelog }}
       pluginVerifierHomeDir: ${{ steps.properties.outputs.pluginVerifierHomeDir }}
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -40,6 +44,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          add-job-summary-as-pr-comment: on-failure
 
       - name: Export properties
         id: properties
@@ -77,10 +83,9 @@ jobs:
 
   test-code:
     name: Test Code
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -92,6 +97,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          add-job-summary-as-pr-comment: on-failure
 
       - name: Run tests
         run: ./gradlew check
@@ -111,14 +118,13 @@ jobs:
 
   inspect-code:
     name: Inspect Code
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       checks: write
       pull-requests: write
     steps:
-
       - name: Maximize build space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -141,16 +147,15 @@ jobs:
         uses: JetBrains/qodana-action@v2024.3
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_205267377 }}
-          QODANA_ENDPOINT: 'https://qodana.cloud'
+          QODANA_ENDPOINT: "https://qodana.cloud"
         with:
           cache-default-branch-only: true
 
   verify-plugin:
     name: Verify Plugin
-    needs: [ build ]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
-
       - name: Maximize build space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -168,6 +173,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          add-job-summary-as-pr-comment: on-failure
 
       - name: Setup plugin verifier IDEs cache
         uses: actions/cache@v4
@@ -188,12 +195,11 @@ jobs:
   release-draft:
     name: Release Draft
     if: github.event_name != 'pull_request' # TODO: run only on main?
-    needs: [ build, test-code, inspect-code, verify-plugin ]
+    needs: [build, test-code, inspect-code, verify-plugin]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
