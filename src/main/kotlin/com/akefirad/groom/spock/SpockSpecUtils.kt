@@ -11,7 +11,6 @@ import kotlin.contracts.contract
 object SpockSpecUtils {
     private const val SPOCK_SPEC_CLASS: String = "spock.lang.Specification"
 
-    @JvmStatic
     fun PsiFile.hasAnySpecification(): Boolean {
         return this is GroovyFile && children
             .filterIsInstance<PsiClass>()
