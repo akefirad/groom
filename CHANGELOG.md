@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-25
+
+- GH-47 remove internal and deprecated apis by @akefirad in https://github.com/akefirad/groom/pull/51
+- GH-52 fix groovy folding arg list by @akefirad in https://github.com/akefirad/groom/pull/53
+- GH-55 add assert hint for spock mocks by @akefirad in https://github.com/akefirad/groom/pull/56
+
 ## [0.1.0] - 2025-01-19
 
 - GH-22 prepare for v0.0.2 by @akefirad in https://github.com/akefirad/groom/pull/23
@@ -22,6 +28,7 @@
 - GH-15 add groovy folding builder by @akefirad in https://github.com/akefirad/groom/pull/18
 - GH-20 cleanup pipelines by @akefirad in https://github.com/akefirad/groom/pull/21
 
-[Unreleased]: https://github.com/akefirad/groom/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/akefirad/groom/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/akefirad/groom/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/akefirad/groom/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/akefirad/groom/commits/v0.0.1
