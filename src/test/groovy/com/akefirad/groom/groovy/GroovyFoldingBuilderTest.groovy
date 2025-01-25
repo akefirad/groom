@@ -8,10 +8,9 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
 import org.junit.Test
 
-import static com.akefirad.oss.easymock.EasyMock.mock
-import static org.easymock.EasyMock.expect
-import static org.easymock.EasyMock.replay
-import static org.easymock.EasyMock.verify
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase {
 
@@ -30,8 +29,7 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         // given:
         def subject = new GroovyFoldingBuilder()
         def root = mock(PsiJavaFile)
-        expect(root.node).andReturn(null)
-        replay(root)
+        when(root.node).thenReturn(null)
 
         // when:
         def result = subject.buildFoldRegions(root, mock(Document), false)
@@ -40,7 +38,7 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert result.length == 0
 
         // and:
-        verify(root)
+        verify(root).node
     }
 
     @Test
@@ -48,13 +46,12 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         // given:
         def subject = new GroovyFoldingBuilder()
         def node = mock(ASTNode)
-        expect(node.getPsi()).andReturn(mock(PsiElement))
-        replay(node)
+        when(node.psi).thenReturn(mock(PsiElement))
 
         // expect:
         assertThrows(IllegalStateException) { subject.getLanguagePlaceholderText(node, TextRange.EMPTY_RANGE) }
 
         // and:
-        verify(node)
+        verify(node).psi
     }
 }
