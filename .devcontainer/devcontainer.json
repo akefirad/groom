@@ -1,0 +1,25 @@
+{
+	"name": "Groom",
+	"image": "mcr.microsoft.com/devcontainers/base:noble",
+	"features": {
+	  "ghcr.io/anthropics/devcontainer-features/claude-code:1.0.5": {}
+	},
+	"remoteUser": "vscode",
+	// "postCreateCommand": "",
+	"mounts": ["source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,ro"],
+	// "forwardPorts": [],
+	"customizations": {
+	  "vscode": {
+		"settings": {
+		  "terminal.integrated.defaultProfile.linux": "zsh",
+		  "terminal.integrated.env.linux": {
+			"ZDOTDIR": "/home/vscode/.config/zsh"
+		  }
+		}
+	  }
+	},
+	"remoteEnv": {
+	  "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+	}
+  }
+  

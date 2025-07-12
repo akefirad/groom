@@ -4,9 +4,9 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
+import kotlin.contracts.contract
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.GrLabeledStatement
-import kotlin.contracts.contract
 
 object SpockSpecUtils {
     private const val SPOCK_SPEC_CLASS: String = "spock.lang.Specification"
