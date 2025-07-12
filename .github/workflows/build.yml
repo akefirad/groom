@@ -171,10 +171,11 @@ jobs:
           distribution: zulu
           java-version: 17
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          add-job-summary-as-pr-comment: on-failure
+      # FIXME: enabling this causes the job to fail while stuck in "Post Setup Gradle"
+      # - name: Setup Gradle
+      #   uses: gradle/actions/setup-gradle@v4
+      #   with:
+      #     add-job-summary-as-pr-comment: on-failure
 
       - name: Setup plugin verifier IDEs cache
         uses: actions/cache@v4
