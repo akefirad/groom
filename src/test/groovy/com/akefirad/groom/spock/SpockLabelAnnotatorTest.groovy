@@ -4,7 +4,7 @@ import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestC
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.junit.Test
 
-class SpockNameAnnotatorTest extends LightPlatformCodeInsightFixture4TestCase {
+class SpockLabelAnnotatorTest extends LightPlatformCodeInsightFixture4TestCase {
 
     private GroovyPsiElementFactory elementFactory
 
