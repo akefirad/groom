@@ -4,17 +4,19 @@ junit = "4.13.2"
 
 # plugins
 changelog = "2.2.1"
-intelliJPlatform = "2.2.1"
+intelliJPlatform = "2.6.0"
 kotlin = "1.9.25"
 kover = "0.9.1"
 qodana = "2024.3.4"
+dependency-versions = "0.51.0"
+dependency-licenses = "2.9"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-mockk = { group = "io.mockk", name = "mockk", version = "1.13.16" }
+mockk = { group = "io.mockk", name = "mockk", version = "1.14.4" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version = "5.15.2" }
 mockito-inline = { group = "org.mockito", name = "mockito-inline", version = "5.2.0" }
-groovy = { group = "org.codehaus.groovy", name = "groovy-test", version = "3.0.23" } # update if you can!
+groovy = { group = "org.codehaus.groovy", name = "groovy-test", version = "3.0.25" } # update if you can!
 
 [bundles]
 mockito = ["mockito-core", "mockito-inline"]
@@ -25,3 +27,5 @@ intelliJPlatform = { id = "org.jetbrains.intellij.platform", version.ref = "inte
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }
+dependency-versions = { id = "com.github.ben-manes.versions", version.ref = "dependency-versions" }
+dependency-licenses = { id = "com.github.jk1.dependency-license-report", version.ref = "dependency-licenses" }
