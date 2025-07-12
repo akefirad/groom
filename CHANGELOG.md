@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-07-12
+
+- GH-72 groovy constructor folding by @akefirad in https://github.com/akefirad/groom/pull/73
+- GH-0 upgrade dependencies and version by @akefirad in https://github.com/akefirad/groom/pull/74
+- GH-0 disabling gradle cache for now by @akefirad in https://github.com/akefirad/groom/pull/75
+- GH-76 make spock label bold by @akefirad in https://github.com/akefirad/groom/pull/77
+
 ## [0.2.0] - 2025-01-25
 
 - GH-47 remove internal and deprecated apis by @akefirad in https://github.com/akefirad/groom/pull/51
@@ -28,7 +35,8 @@
 - GH-15 add groovy folding builder by @akefirad in https://github.com/akefirad/groom/pull/18
 - GH-20 cleanup pipelines by @akefirad in https://github.com/akefirad/groom/pull/21
 
-[Unreleased]: https://github.com/akefirad/groom/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/akefirad/groom/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/akefirad/groom/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/akefirad/groom/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/akefirad/groom/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/akefirad/groom/commits/v0.0.1
