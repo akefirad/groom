@@ -14,7 +14,7 @@ dependency-licenses = "2.9"
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockk = { group = "io.mockk", name = "mockk", version = "1.14.4" }
-mockito-core = { group = "org.mockito", name = "mockito-core", version = "5.15.2" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version = "5.18.0" }
 mockito-inline = { group = "org.mockito", name = "mockito-inline", version = "5.2.0" }
 groovy = { group = "org.codehaus.groovy", name = "groovy-test", version = "3.0.25" } # update if you can!
 
