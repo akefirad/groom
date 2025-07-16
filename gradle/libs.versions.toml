@@ -9,7 +9,7 @@ intelliJPlatform = "2.6.0"
 kotlin = "2.2.0"
 kover = "0.9.1"
 qodana = "2024.3.4"
-dependency-versions = "0.51.0"
+dependency-versions = "0.52.0"
 dependency-licenses = "2.9"
 
 [libraries]
