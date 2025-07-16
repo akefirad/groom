@@ -1,6 +1,7 @@
 ### Intellij ###
 .gradle
 .idea
+.kotlin
 .intellijPlatform
 build
 .qodana
