@@ -144,7 +144,7 @@ jobs:
           java-version: 17
 
       - name: Inspect code
-        uses: JetBrains/qodana-action@v2024.3
+        uses: JetBrains/qodana-action@v2025.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_205267377 }}
           QODANA_ENDPOINT: "https://qodana.cloud"

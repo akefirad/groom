@@ -1,11 +1,12 @@
 [versions]
 # libraries
 junit = "4.13.2"
+opentest4j = "1.3.0"
 
 # plugins
 changelog = "2.2.1"
 intelliJPlatform = "2.6.0"
-kotlin = "1.9.25"
+kotlin = "2.1.20"
 kover = "0.9.1"
 qodana = "2024.3.4"
 dependency-versions = "0.51.0"
@@ -13,13 +14,8 @@ dependency-licenses = "2.9"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-mockk = { group = "io.mockk", name = "mockk", version = "1.14.4" }
-mockito-core = { group = "org.mockito", name = "mockito-core", version = "5.15.2" }
-mockito-inline = { group = "org.mockito", name = "mockito-inline", version = "5.2.0" }
+opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
 groovy = { group = "org.codehaus.groovy", name = "groovy-test", version = "3.0.25" } # update if you can!
-
-[bundles]
-mockito = ["mockito-core", "mockito-inline"]
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

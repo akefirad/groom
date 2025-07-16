@@ -1,7 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
@@ -22,6 +21,9 @@ version = providers.gradleProperty("pluginVersion").get()
 // Set the JVM language level used to build the project.
 kotlin {
     jvmToolchain(17)
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.contracts.ExperimentalContracts")
+    }
 }
 
 // Configure project's dependencies
@@ -37,8 +39,8 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation(libs.junit)
-    testImplementation(libs.mockk)
     testImplementation(libs.groovy)
+    testImplementation(libs.opentest4j)
 
     // TODO: use Mockito!
     testImplementation("org.easymock:easymock:5.5.0")
@@ -136,10 +138,6 @@ kover {
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
-    }
-
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
     }
