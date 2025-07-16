@@ -39,7 +39,6 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation(libs.junit)
-    testImplementation(libs.mockk)
     testImplementation(libs.groovy)
     testImplementation(libs.opentest4j)
 

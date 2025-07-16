@@ -15,7 +15,6 @@ dependency-licenses = "2.9"
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
-mockk = { group = "io.mockk", name = "mockk", version = "1.14.4" }
 groovy = { group = "org.codehaus.groovy", name = "groovy-test", version = "3.0.25" } # update if you can!
 
 [plugins]
