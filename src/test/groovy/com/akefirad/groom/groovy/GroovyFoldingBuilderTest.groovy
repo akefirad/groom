@@ -9,11 +9,11 @@ import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrNewExp
 import org.jetbrains.plugins.groovy.lang.psi.api.types.GrCodeReferenceElement
 import org.junit.Test
 
-import static com.akefirad.oss.easymock.EasyMock.mock
 import static com.intellij.openapi.util.TextRange.EMPTY_RANGE
-import static org.easymock.EasyMock.expect
-import static org.easymock.EasyMock.replay
-import static org.easymock.EasyMock.verify
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.times
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase {
 
@@ -32,9 +32,7 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         // given:
         def subject = new GroovyFoldingBuilder()
         def root = mock(PsiJavaFile)
-
-        expect(root.node).andReturn(null)
-        replay(root)
+        when(root.node).thenReturn(null)
 
         // when:
         def result = subject.buildFoldRegions(root, mock(Document), false)
@@ -43,7 +41,7 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert result.length == 0
 
         // and:
-        verify(root)
+        verify(root).node
     }
 
     @Test
@@ -55,10 +53,9 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         def root = mock(PsiElement)
         def constructor = mock(GrNewExpression)
 
-        expect(root.getChildren()).andReturn([constructor] as PsiElement[])
-        expect(constructor.getText()).andReturn("new Foo(\n  param")  // Not properly closed - missing )
-        expect(constructor.getChildren()).andReturn([] as PsiElement[])
-        replay(root, constructor)
+        when(root.children).thenReturn([constructor] as PsiElement[])
+        when(constructor.text).thenReturn("new Foo(\n  param")  // Not properly closed - missing )
+        when(constructor.children).thenReturn([] as PsiElement[])
 
         // when:
         subject.addConstructorCallFoldRegions(descriptors, root)
@@ -67,7 +64,9 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert descriptors.isEmpty()
 
         // and:
-        verify(root, constructor)
+        verify(root).children
+        verify(constructor).text
+        verify(constructor).children
     }
 
     @Test
@@ -79,11 +78,10 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         def root = mock(PsiElement)
         def constructor = mock(GrNewExpression)
 
-        expect(root.getChildren()).andReturn([constructor] as PsiElement[])
-        expect(constructor.getText()).andReturn("new Foo(\n    bar\n)").anyTimes()
-        expect(constructor.getArgumentList()).andReturn(null)  // For the args check
-        expect(constructor.getChildren()).andReturn([] as PsiElement[])
-        replay(root, constructor)
+        when(root.children).thenReturn([constructor] as PsiElement[])
+        when(constructor.text).thenReturn("new Foo(\n)")
+        when(constructor.argumentList).thenReturn(null) // For the args check
+        when(constructor.children).thenReturn([] as PsiElement[])
 
         // when:
         subject.addConstructorCallFoldRegions(descriptors, root)
@@ -92,7 +90,10 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert descriptors.isEmpty()
 
         // and:
-        verify(root, constructor)
+        verify(root).children
+        verify(constructor, times(2)).text
+        verify(constructor).argumentList
+        verify(constructor).children
     }
 
     @Test
@@ -100,15 +101,13 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         // given:
         def subject = new GroovyFoldingBuilder()
         def node = mock(ASTNode)
-
-        expect(node.getPsi()).andReturn(mock(PsiElement))
-        replay(node)
+        when(node.psi).thenReturn(mock(PsiElement))
 
         // expect:
         assertThrows(IllegalArgumentException) { subject.getLanguagePlaceholderText(node, EMPTY_RANGE) }
 
         // and:
-        verify(node)
+        verify(node).psi
     }
 
     @Test
@@ -118,9 +117,8 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         def node = mock(ASTNode)
         def constructor = mock(GrNewExpression)
 
-        expect(node.getPsi()).andReturn(constructor)
-        expect(constructor.getReferenceElement()).andReturn(null)
-        replay(node, constructor)
+        when(node.psi).thenReturn(constructor)
+        when(constructor.referenceElement).thenReturn(null)
 
         // when:
         def result = subject.getLanguagePlaceholderText(node, EMPTY_RANGE)
@@ -129,7 +127,8 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert result == "new (...)"
 
         // and:
-        verify(node, constructor)
+        verify(node).psi
+        verify(constructor).referenceElement
     }
 
     @Test
@@ -140,10 +139,9 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         def constructor = mock(GrNewExpression)
         def reference = mock(GrCodeReferenceElement)
 
-        expect(node.getPsi()).andReturn(constructor)
-        expect(constructor.getReferenceElement()).andReturn(reference)
-        expect(reference.getReferenceName()).andReturn(null)
-        replay(node, constructor, reference)
+        when(node.psi).thenReturn(constructor)
+        when(constructor.referenceElement).thenReturn(reference)
+        when(reference.referenceName).thenReturn(null)
 
         // when:
         def result = subject.getLanguagePlaceholderText(node, EMPTY_RANGE)
@@ -152,7 +150,9 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert result == "new (...)"
 
         // and:
-        verify(node, constructor, reference)
+        verify(node).psi
+        verify(constructor).referenceElement
+        verify(reference).referenceName
     }
 
     @Test
@@ -163,9 +163,8 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         def constructor = mock(GrNewExpression)
         def argumentList = mock(PsiElement)
 
-        expect(node.getPsi()).andReturn(argumentList)
-        expect(argumentList.getParent()).andReturn(constructor)
-        replay(node, argumentList, constructor)
+        when(node.psi).thenReturn(argumentList)
+        when(argumentList.parent).thenReturn(constructor)
 
         // when:
         def result = subject.getLanguagePlaceholderText(node, EMPTY_RANGE)
@@ -174,7 +173,8 @@ class GroovyFoldingBuilderTest extends LightPlatformCodeInsightFixture4TestCase 
         assert result == "(...)"
 
         // and:
-        verify(node, argumentList, constructor)
+        verify(node).psi
+        verify(argumentList).parent
     }
 
 }
