@@ -8,14 +8,15 @@ changelog = "2.2.1"
 intelliJPlatform = "2.6.0"
 kotlin = "2.2.0"
 kover = "0.9.1"
-qodana = "2024.3.4"
-dependency-versions = "0.51.0"
+qodana = "2025.1.1"
+dependency-versions = "0.52.0"
 dependency-licenses = "2.9"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
-groovy = { group = "org.codehaus.groovy", name = "groovy-test", version = "3.0.25" } # update if you can!
+groovy = { group = "org.apache.groovy", name = "groovy-test", version = "4.0.27" }
+mockito = { group = "org.mockito", name = "mockito-core", version = "4.11.0" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
