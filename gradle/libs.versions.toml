@@ -15,7 +15,7 @@ dependency-licenses = "2.9"
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
-groovy = { group = "org.apache.groovy", name = "groovy-test", version = "4.0.27" }
+groovy = { group = "org.apache.groovy", name = "groovy-test", version = "4.0.28" }
 mockito = { group = "org.mockito", name = "mockito-core", version = "4.11.0" }
 
 [plugins]
