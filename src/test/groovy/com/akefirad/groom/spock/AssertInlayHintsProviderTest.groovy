@@ -6,6 +6,7 @@ import com.intellij.codeInsight.hints.declarative.InlayProviderPassInfo
 import com.intellij.codeInsight.hints.declarative.impl.DeclarativeInlayHintsPass
 import com.intellij.codeInsight.hints.declarative.impl.inlayRenderer.DeclarativeInlayRenderer
 import com.intellij.codeInsight.hints.declarative.impl.views.TextInlayPresentationEntry
+import com.intellij.codeInsight.multiverse.CodeInsightContexts
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
@@ -454,6 +455,7 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
         def pass = ApplicationManager.application.executeOnPooledThread(
             { new DeclarativeInlayHintsPass(file, editor, [providerInfo], false, false) } as Callable<DeclarativeInlayHintsPass>
         ).get()
+        pass.context = CodeInsightContexts.defaultContext()
         applyPassAndCheckResult(pass, sourceText, expectedText)
     }
 
