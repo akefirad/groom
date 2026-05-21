@@ -10,7 +10,7 @@ kotlin = "2.2.21"
 kover = "0.9.1"
 qodana = "2025.2.1"
 dependency-versions = "0.52.0"
-dependency-licenses = "2.9"
+dependency-licenses = "3.1.2"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
