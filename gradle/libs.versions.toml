@@ -16,7 +16,7 @@ dependency-licenses = "2.9"
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
 groovy = { group = "org.apache.groovy", name = "groovy-test", version = "5.0.2" }
-mockito = { group = "org.mockito", name = "mockito-core", version = "5.18.0" }
+mockito = { group = "org.mockito", name = "mockito-core", version = "5.23.0" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
