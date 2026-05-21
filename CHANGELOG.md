@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-21
+
 - GH-118 upgrade IDE support to 2026.1 by @akefirad in https://github.com/akefirad/groom/pull/119
 - GH-121 upgrade dependencies by @akefirad in https://github.com/akefirad/groom/pull/122
 
@@ -38,7 +40,8 @@
 - GH-15 add groovy folding builder by @akefirad in https://github.com/akefirad/groom/pull/18
 - GH-20 cleanup pipelines by @akefirad in https://github.com/akefirad/groom/pull/21
 
-[Unreleased]: https://github.com/akefirad/groom/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/akefirad/groom/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/akefirad/groom/compare/v0.3.0...v0.5.0
 [0.3.0]: https://github.com/akefirad/groom/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/akefirad/groom/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/akefirad/groom/compare/v0.0.1...v0.1.0
