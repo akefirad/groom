@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- GH-118 upgrade IDE support to 2026.1 by @akefirad in https://github.com/akefirad/groom/pull/119
+- GH-121 upgrade dependencies by @akefirad in https://github.com/akefirad/groom/pull/122
+
 ## [0.3.0] - 2025-07-12
 
 - GH-72 groovy constructor folding by @akefirad in https://github.com/akefirad/groom/pull/73
