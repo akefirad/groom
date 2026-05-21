@@ -4,14 +4,17 @@ import com.intellij.codeInsight.hints.InlayDumpUtil
 import com.intellij.codeInsight.hints.declarative.InlayHintsProvider
 import com.intellij.codeInsight.hints.declarative.InlayProviderPassInfo
 import com.intellij.codeInsight.hints.declarative.impl.DeclarativeInlayHintsPass
-import com.intellij.codeInsight.hints.declarative.impl.DeclarativeInlayRenderer
-import com.intellij.codeInsight.hints.declarative.impl.TextInlayPresentationEntry
+import com.intellij.codeInsight.hints.declarative.impl.inlayRenderer.DeclarativeInlayRenderer
+import com.intellij.codeInsight.hints.declarative.impl.views.TextInlayPresentationEntry
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase
 import com.intellij.testFramework.utils.inlays.InlayHintsProviderTestCase
 import org.intellij.lang.annotations.Language
 import org.jetbrains.plugins.groovy.lang.psi.GroovyPsiElementFactory
 import org.junit.Test
+
+import java.util.concurrent.Callable
 
 import static com.akefirad.groom.test.spock.util.SpockSpecification.CODE as SpecificationClass
 
@@ -443,12 +446,14 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
         if (verifyHintsPresence) {
             InlayHintsProviderTestCase.Companion.verifyHintsPresence(expectedText)
         }
-        def sourceText = InlayDumpUtil.INSTANCE.removeHints(expectedText)
+        def sourceText = InlayDumpUtil.INSTANCE.removeInlays(expectedText)
         myFixture.configureByText(fileName, sourceText)
         def file = myFixture.file
         def editor = myFixture.editor
         def providerInfo = new InlayProviderPassInfo(provider, "provider.id", enabledOptions)
-        def pass = new DeclarativeInlayHintsPass(file, editor, [providerInfo], false, false)
+        def pass = ApplicationManager.application.executeOnPooledThread(
+            { new DeclarativeInlayHintsPass(file, editor, [providerInfo], false, false) } as Callable<DeclarativeInlayHintsPass>
+        ).get()
         applyPassAndCheckResult(pass, sourceText, expectedText)
     }
 
@@ -459,12 +464,11 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
     ) {
         pass.doCollectInformation(new EmptyProgressIndicator())
         pass.applyInformationToEditor()
-        def file = myFixture.file
-        def doc = myFixture.getDocument(file)
         def editor = myFixture.editor
-        def dump = InlayDumpUtil.INSTANCE.dumpHintsInternal(
+        def dump = InlayDumpUtil.INSTANCE.dumpInlays(
             previewText,
-            null,
+            editor,
+            { inlay -> true },
             { r, _ ->
                 (r as DeclarativeInlayRenderer).presentationList
                     .entries
@@ -472,10 +476,9 @@ class AssertInlayHintsProviderTest extends LightPlatformCodeInsightFixture4TestC
                     .collect { it.text }
                     .join("|")
             },
-            file,
-            editor,
-            doc,
             0,
+            false,
+            false,
         )
         assertEquals(expectedText.trim(), dump.trim())
     }
